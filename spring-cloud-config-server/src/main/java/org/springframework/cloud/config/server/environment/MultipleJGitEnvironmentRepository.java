@@ -56,6 +56,16 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 
 	private Map<String, JGitEnvironmentRepository> placeholders = new LinkedHashMap<String, JGitEnvironmentRepository>();
 
+	private Map<String, String> labelRemaps = new LinkedHashMap<String, String>();
+	
+	public Map<String, String> getLabelRemaps() {
+		return labelRemaps;
+	}
+
+	public void setLabelRemaps(Map<String, String> labelRemaps) {
+		this.labelRemaps = labelRemaps;
+	}
+
 	public MultipleJGitEnvironmentRepository(ConfigurableEnvironment environment) {
 		super(environment);
 	}
@@ -117,6 +127,9 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 
 	@Override
 	public Locations getLocations(String application, String profile, String label) {
+		if(labelRemaps.get(label) != null) {
+			label = labelRemaps.get(label);
+		}
 		for (PatternMatchingJGitEnvironmentRepository repository : this.repos.values()) {
 			if (repository.matches(application, profile, label)) {
 				for (JGitEnvironmentRepository candidate : getRepositories(repository,
@@ -150,6 +163,9 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 
 	@Override
 	public Environment findOne(String application, String profile, String label) {
+		if(labelRemaps.get(label) != null) {
+			label = labelRemaps.get(label);
+		}
 		for (PatternMatchingJGitEnvironmentRepository repository : this.repos.values()) {
 			if (repository.matches(application, profile, label)) {
 				for (JGitEnvironmentRepository candidate : getRepositories(repository,
